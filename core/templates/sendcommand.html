@@ -1,0 +1,283 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Send Command | Page {% endblock %}
+{% block stylesheets %}{% endblock stylesheets %}
+{% load static %}
+{% block content %}
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.4-build.3588/angular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: #d7dde7;
+  height: 100vh;
+  position: relative;
+  margin: 0;
+}
+
+.container2 {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+}
+
+.control-group {
+  padding-top: 33px;
+  position: relative;
+}
+
+.control-group input[type="text"] {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  border: 6px solid #9fa6b3;
+  background: #fff;
+  border-radius: 0;
+  color: #222;
+  font-family: "Poppins", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  outline: none;
+  padding: 30px 15px 2px 15px;
+  transition-property: border, padding;
+  transition-duration: 500ms;
+  transition-timing-function: ease;
+  width: 100%;
+}
+
+.control-group input[type="text"]:focus {
+  border-color: #2d9ae3;
+  padding-bottom: 16px;
+  padding-top: 16px;
+}
+
+.control-group input[type="text"] + label {
+  background: #9fa6b3;
+  color: #fff;
+  font-weight: 500;
+  left: 0;
+  padding: 5px 20px 5px 20px;
+  position: absolute;
+  top: 33px;
+  transition-property: top, background;
+  transition-duration: 500ms;
+  transition-timing-function: ease;
+}
+
+.control-group input[type="text"]:focus + label {
+  background: #2d9ae3;
+  top: 0;
+}
+form2 {
+  /* This bit sets up the horizontal layout */
+  display:flex;
+  flex-direction:row;
+
+  /* This bit draws the box around it */
+  border:1px solid grey;
+
+  /* I've used padding so you can see the edges of the elements. */
+  padding:2px;
+}
+
+input {
+  /* Tell the input to use all the available space */
+  flex-grow:2;
+  /* And hide the input's outline, so the form looks like the outline */
+  border:none;
+}
+
+input:focus {
+  /* removing the input focus blue box. Put this on the form if you like. */
+  outline: none;
+}
+
+button {
+  /* Just a little styling to make it pretty */
+  border:1px solid blue;
+  background:blue;
+  color:white;
+}
+</style>
+
+
+<script>
+      let ip = '{{ ip }}'
+
+        xmlhttp = new XMLHttpRequest();
+        function log(msg) {
+           document.getElementById("cikti").innerHTML = msg
+         }
+
+        function reqListener () {
+            console.log('komut başladı');
+        }
+
+        function updateProgress (oEvent) {
+            event1 = oEvent;
+            log(oEvent.target.responseText);
+        }
+
+        function run() {
+			url = 'http://'+window.location.host+ '/' +'clientregister/'+ ip +'/'+ document.getElementById("command").value +'/';
+			xmlhttp.addEventListener('load', reqListener);
+			xmlhttp.addEventListener('progress', updateProgress, false);
+			var a = xmlhttp.open("GET", url, true);
+			console.log(a)
+			xmlhttp.send();
+		}
+    function onBtnHandler(id,op) {
+        var id = id;
+        var op = op;
+        console.log(id, op);
+        var token ="{{ csrf_token }}";
+        $.ajax({
+            headers: {"X-CSRFToken": token},
+            dataType: "JSON",
+            url: '{% url 'ajax_send' ip %}',
+            type: 'POST',
+            data: {"op": op, "id": id},
+            success: function(data){
+               swal(
+                 'Good job!',
+                 data['data'],
+             'success'
+                    )
+         console.log(data['data']);
+         window.location.reload();
+                 },
+            error: function(error){
+         console.log("Error:");
+            swal(
+                 'Fail job!',
+                 data['data'],
+             'error'
+                    )
+                 window.location.reload();
+    }
+        });
+    }
+    var bash = angular.module('bash',[]);
+
+        bash.controller('script', [ '$scope', function($scope){
+    $scope.bash = '#!/bin/bash';
+        }]);
+    </script>
+
+
+
+
+    <section class="content">
+      <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+               <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Bash Script Write</h3>
+              </div>
+                 <form action="{% url 'client_command' ip   %}" method="post">
+    {% csrf_token %}
+
+                        <div class="input-group">
+                                   <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input type="text" class="form-control" placeholder="Script Name"  {{ form.name }}
+                              </div>
+                      <body ng-app='bash'>
+                        <div ng-controller="script">
+                     <div class="input-group">
+                                   <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <textarea type="text"  ng-model='bash' row="4" cols="500" class="form-control" placeholder="Script Here!!"  {{ form.script }}
+                              </div>
+                              </div>
+  </body>
+                               <button type="submit" class="btn btn-primary" value="submit" >Save</button>
+                    </form>
+         </div>
+           </div>
+
+       <div class="col-md-6">
+               <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Bash Script Table</h3>
+              </div>
+<table id="script" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Bash Script</th>
+                <th>Author</th>
+                <th>Created</th>
+                 <th>Operation</th>
+
+            </tr>
+        </thead>
+        <tbody>
+           {% for script in db %}
+            <tr>
+                <td>{{script.name}}</td>
+                <td>{{script.author}}</td>
+                <td>{{script.created}}</td>
+                <td class="text-md-center">      <span data-tooltip="Delete" onclick="onBtnHandler ('{{script.id}}', 'delete')"class="fas fa-trash-alt"  aria-hidden="true"></span>&nbsp;&nbsp;&#160;&#160;&#160;&#160;&#160;&#160;
+                        <span  data-tooltip="Run" onclick="onBtnHandler ('{{script.id}}','run')" class="far fa-paper-plane"  aria-hidden="true"></span>&nbsp;&nbsp; </td>
+
+            </tr>
+        {% endfor %}
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+            </div>
+              </div>
+    <br>
+    <br>
+     <div class="col-md-6">
+               <div class="card card-primary">
+           <div class="container2 ">
+  <div class="control-group">
+      <form2>
+    <input id="command" type="text" name="input" placeholder="Please basic command usage" />
+    <label for="input">Command</label>
+   <button data-toggle="modal" data-target="#output" onclick="run()">Send</button>
+             </form2>
+                 </div>
+                     </div>
+                </div>
+                 </div>
+                </section>
+            </body>
+           <div class="modal fade" id="output" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">OutPut {{ ip }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div style="color:blue" class="modal-body">
+                <pre style="color:black" id="cikti"><code></code></pre>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+{% endblock javascripts %}
