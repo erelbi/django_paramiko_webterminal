@@ -5,7 +5,7 @@
 ```bash
 $ # Get the code
 $ git clone https://github.com/erelbi/django_paramiko_webterminal.git
-$ cd django-dashboard-black
+$ cd django_paramiko_webterminal
 $
 $ # Virtualenv modules installation (Unix based systems)
 $ virtualenv env
