@@ -88,9 +88,9 @@ class Register(View):
         try:
 
             for status_client in client_list:
-                client = paramiko.SSHClient()
-                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(status_client['ip'], username=status_client['user'], port=status_client['port'],timeout=3, look_for_keys=False)
+                conn = paramiko.SSHClient()
+                conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                conn.connect(status_client['ip'], username=status_client['user'], port=status_client['port'],timeout=3, look_for_keys=False)
                 SSHconnect.objects.filter(ip=status_client['ip']).update(status='online')
                 if SSHconnect.objects.filter(ip=status_client['ip']).values('status') == None:
                     try:
@@ -105,7 +105,7 @@ class Register(View):
         except:
             SSHconnect.objects.filter(ip=status_client['ip']).update(status='offline')
             pass
-        client.close()
+
         return SSHconnect.objects.all()
 
 
