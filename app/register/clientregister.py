@@ -13,7 +13,10 @@ class Register(View):
     def __init__(self):
         self.status = list()
         self.user = getpass.getuser()
-        self.ssh_dir = "/home/%s/.ssh/" % (self.user)
+        if self.user == 'root':
+            self.ssh_dir = "/root/.ssh/"
+        else:
+            self.ssh_dir = "/home/%s/.ssh/" % (self.user)
         self.gen_key()
         self.host_know()
         self.ssh_connect = SSHconnect.objects.all()
@@ -86,11 +89,14 @@ class Register(View):
     def client_status(self):
         client_list = self.gen_list_client()
         try:
-
+            print(client_list)
             for status_client in client_list:
                 conn = paramiko.SSHClient()
                 conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                conn.connect(status_client['ip'], username=status_client['user'], port=status_client['port'],timeout=3, look_for_keys=False)
+                print(status_client['ip'], status_client['user'], status_client['port'])
+                #conn.connect(status_client['ip'], username=status_client['user'], port=status_client['port'],timeout=3, look_for_keys=False)
+                conn.connect(status_client['ip'], username=status_client['user'], port=status_client['port'], timeout=3)
+
                 SSHconnect.objects.filter(ip=status_client['ip']).update(status='online')
                 if SSHconnect.objects.filter(ip=status_client['ip']).values('status') == None:
                     try:
@@ -104,6 +110,7 @@ class Register(View):
                         continue
         except:
             SSHconnect.objects.filter(ip=status_client['ip']).update(status='offline')
+            conn.close()
             pass
 
         return SSHconnect.objects.all()

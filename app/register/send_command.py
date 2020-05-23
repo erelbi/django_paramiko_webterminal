@@ -11,6 +11,7 @@ from app.forms import BashScriptForm
 from app.models import BashScript
 
 
+
 class SSHclient(View):
     def __init__(self):
         self.script = BashScript.objects.all()
@@ -30,39 +31,32 @@ class SSHclient(View):
                 form = BashScriptForm()
                 return render(request,'sendcommand.html', {'form':form,'db':self.script})
 
-
-
-    def run(self,command,ip):
-        self.user = SSHconnect.objects.filter(ip=ip).first().user
-        self.port = SSHconnect.objects.filter(ip=ip).first().port
-        self.ip = ip
+    def connc(ip):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.ip, username=self.user, port=self.port)
+        user = SSHconnect.objects.filter(ip=ip).first().user
+        port = SSHconnect.objects.filter(ip=ip).first().port
+        ssh.connect(ip, username=user, port=port)
         transport = ssh.get_transport()
         session = transport.open_session()
         session.set_combine_stderr(True)
         session.get_pty()
+        return session,ssh
+
+
+
+    def run(self,command,ip):
+        session= SSHclient.connc(ip)[0]
         session.exec_command(command)
         stdout = session.makefile('r', -1)
         for line in iter(stdout.readline, ""):
             yield line
-        ssh.close()
+        session.close()
 
 
     def bashscript(self,bash_script,ip):
-        print(bash_script,ip)
-        user = SSHconnect.objects.filter(ip=ip).first().user
-        port = SSHconnect.objects.filter(ip=ip).first().port
-        ip = ip
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip, username=user, port=port)
-        sftp = ssh.open_sftp()
-        transport = ssh.get_transport()
-        session = transport.open_session()
-        session.set_combine_stderr(True)
-        session.get_pty()
+        session = SSHclient.connc(ip)[0]
+        sftp = SSHclient.connc(ip)[1].open_sftp()
         cd = os.path.realpath(MEDIA_URL)
         file = '{}'.format(bash_script)
         dd = (cd+"/"+file )
@@ -73,15 +67,7 @@ class SSHclient(View):
         for line in iter(stdout.readline, ""):
             yield line
         sftp.close()
-        ssh.close()
-
-
-
-
-
-
-
-
+        session.close()
 
     def stream(self,ip,command,*args,**kwargs):
         script = BashScript.objects.values_list('name',  flat=True)
@@ -95,7 +81,7 @@ class SSHclient(View):
         response['Cache-Control'] = 'no-cache'
         return response
 
-def post_ajax(request, ip):
+def post_ajax(request,ip):
     if request.is_ajax():
         id = request.POST.get('id')
         op = request.POST.get('op')
