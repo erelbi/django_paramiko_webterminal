@@ -1,10 +1,8 @@
-# from django.apps import AppConfig
-#
-#
-# class BashConfig(AppConfig):
-#     name = 'django_paramiko_webterminal.app'
-#     verbose_name = _('app')
-#
-#     def ready(self):
-#             import app.signals
-#             print("içerde")
+from django.apps import AppConfig
+
+
+class NotifierConfig(AppConfig):
+    name = 'app'
+
+    def ready(self):
+        from . import signals

@@ -7,6 +7,7 @@ from django.conf.urls import url
 from django.urls import path, re_path
 from app import views
 from app.register import clientregister, send_command
+from app.register.ajax_request import ajax_delete, ajax_update
 
 urlpatterns = [
     # Matches any html file 
@@ -17,6 +18,8 @@ urlpatterns = [
     url(r'^clientregister/$', clientregister.Register.as_view(), name="registerFTP"),
     url(r'^clientregister/(?P<ip>[0-9_.]+)/$', send_command.SSHclient.as_view(), name="client_command"),
    url(r'^(?P<ip>[0-9_.]+)/$', send_command.post_ajax, name="ajax_send"),
-    url(r'^clientregister/(?P<ip>[0-9_.]+)/(?P<command>[^\n]+)/$', send_command.SSHclient.stream,
-        name="result"),
+    url(r'^clientregister/(?P<ip>[0-9_.]+)/(?P<command>[^\n]+)/$', send_command.SSHclient.stream,name="result"),
+    url(r'^(?P<ip>[0-9_.]+)/delete/$', ajax_delete, name="delete"),
+    url(r'^(?P<ip>[0-9_.]+)/update/$', ajax_update, name="update"),
+
 ]

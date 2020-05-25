@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os
+import app
 from decouple import config
 from unipath import Path
 import dj_database_url
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'channels',
 
 ]
 
@@ -68,6 +70,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+
+ASGI_APPLICATION = "core.routing.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -127,3 +131,12 @@ STATICFILES_DIRS = (
 )
 #############################################################
 #############################################################
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}   

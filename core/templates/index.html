@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-
+{% load staticfiles %}
 {% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
@@ -148,11 +148,6 @@
 					    	}
 						});
 					}
-        </script>
-    <script>
-         $("#btn_ref").click(function (e){
-               location.reload();
-         });
         </script>
 
 {% endblock content %}
