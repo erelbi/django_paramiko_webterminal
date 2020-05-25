@@ -26,7 +26,7 @@ class SSHclient(View):
             obj = form.save(commit=False)
             obj.author=user
             form.save()
-            return (HttpResponseRedirect(reverse('client_command',args=(ip,))))
+            return HttpResponseRedirect(reverse('client_command',args=(ip,)))
         else:
                 form = BashScriptForm()
                 return render(request,'sendcommand.html', {'form':form,'db':self.script})

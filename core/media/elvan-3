@@ -1,0 +1,3 @@
+#!/bin/bash
+apt  update &&
+echo "tamam oldu bu iş"

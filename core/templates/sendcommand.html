@@ -2,6 +2,7 @@
 {% block title %}Send Command | Page {% endblock %}
 {% block stylesheets %}{% endblock stylesheets %}
 {% load static %}
+{%  load return_int %}
 
 
 {% block content %}
@@ -224,14 +225,13 @@ button {
         </thead>
         <tbody>
            {% for script in db %}
-            {% if   script.point < '10'  %}
+                 {% if  script.point|to_int < 10  %}
             <tr>
 
                 <td>{{script.name}}</td>
                 <td>{{script.author}}</td>
                 <td>{{script.created}}</td>
                 <td class="text-md-center">      <span data-tooltip="Delete" onclick="onBtnHandler ('{{script.id}}', 'delete')"class="fas fa-trash-alt"  aria-hidden="true"></span>&nbsp;&nbsp;&#160;&#160;&#160;&#160;&#160;&#160;
-{#                        <span  data-tooltip="Run" onclick="onBtnHandler ('{{script.id}}','run')" class="far fa-paper-plane"  aria-hidden="true"></span>&nbsp;&nbsp; </td>#}
 
             </tr>
                 {% endif %}
