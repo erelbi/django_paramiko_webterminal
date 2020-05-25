@@ -1,5 +1,5 @@
 # [Django Paramiko Web Terminal](https://deney.site)
-
+![](github.gif)
 ** Web Tabanlı Django Terminal
 
 ```bash
@@ -36,4 +36,5 @@ $ # Access the web app in browser: http://127.0.0.1:8000/
 
 ## Read Me
 
-Düzenlenecek# django_paramiko_webterminal
+For this project Expert Systems course, see.
+With SSH, we can send commands to remote clients and see the result. It has an expert system that analyzes the scenario for script writing.
