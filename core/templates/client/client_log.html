@@ -1,0 +1,158 @@
+{% extends 'layouts/base-client.html' %}
+{% block title %}Send Command | Page {% endblock %}
+{% block stylesheets %}{% endblock stylesheets %}
+{% load static %}
+{%  load return_int %}
+
+
+{% block content %}
+<body>
+<link href="{% static 'assets/css/gaugeMeter.css' %}" rel="stylesheet" />
+<link href="{% static 'assets/css/sendcommand-general.css' %}" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.4-build.3588/angular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+
+
+
+
+
+    <script>
+      let ip = '{{ ip }}'
+    var data;
+         google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Memory', 0],
+          ['CPU', 0],
+          ['DISK', 0]
+        ]);
+
+        var options = {
+          width: 400, height: 120,
+          redFrom: 90, redTo: 100,
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 5
+        };
+
+        var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+         setInterval(clientInfo, 2000);
+
+        function  clientInfo(){
+         var token ="{{ csrf_token }}";
+              $.ajax({
+            headers: {"X-CSRFToken": token},
+            dataType: "JSON",
+            url: '{% url   'client_info'  ip  %}',
+            type: 'POST',
+            data: {"ip":ip},
+            success: function(datax){
+                        data.setValue(0, 1, datax['ram']);
+                         data.setValue(1, 1, datax['cpu']);
+                             data.setValue(2, 1, datax['disk']);
+                        chart.draw(data, options);
+                        console.log(data['ram'])
+                    }
+
+            }
+            )
+
+        }
+        }
+
+
+    </script>
+
+    <section class="content">
+      <div class="container-fluid">
+    <div class="row">
+        <div id="chart_div" style="width: 400px; height: 120px;"></div>
+        </div>
+         </div>
+    </section>
+
+{{pid}}
+
+ <script>
+
+
+
+    var  globalVariable;
+    document.addEventListener('DOMContentLoaded', function() {
+     const webSocketBridge = new channels.WebSocketBridge();
+
+
+      webSocketBridge.connect('/notifications/');
+      webSocketBridge.listen(function(action, stream) {
+        console.log("RESPONSE:", action);
+        if(action.event == "bashscript") {
+            var point = action.point;
+            var script_name = action.name;
+             var token = '{{csrf_token}}';
+            if (10 > point) {
+                 window.alert('script safe for system');
+                $.ajax({
+                    headers: {"X-CSRFToken": token},
+                    dataType: "JSON",
+                    url: '{% url 'update' ip %}',
+                    type: "POST",
+                    data: {
+                        'name': script_name,
+                        'point': point,
+                    },
+                    success: function (data) {
+                        if (data.is_update) {
+                            alert(data.error_message);
+                        }
+                    }
+
+                });
+            } else if (point > 10) {
+                window.alert('script is danger for system');
+                $.ajax({
+                    headers: {"X-CSRFToken": token},
+                    dataType: "JSON",
+                    url: '{% url 'delete' ip %}',
+                    type: "POST",
+                    data: {
+                        'name': script_name,
+                    },
+                    success: function (data) {
+                        if (data.is_delete) {
+                            alert(data.error_message);
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+
+
+      })
+      document.ws = webSocketBridge; /* for debugging */
+    })
+
+    </script>
+                      <script src="{% static 'assets/js/websocketbridge.js' %}" type="text/javascript"></script>
+
+
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+{% endblock javascripts %}

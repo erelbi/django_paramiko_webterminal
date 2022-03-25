@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
@@ -63,7 +63,7 @@
                  <td>{{ ssh.port }}</td>
         <td class="text-center">
                 {% if  "online" == ssh.status %}
-                          <a href="/clientregister/{{ ssh.ip }}">
+                          <a href="/{{ ssh.ip }}/client_page">
                         <span style="margin:auto; display:table;"  class="fa fa-desktop"  aria-hidden="true"></span></a>
                           {% elif "offline" == ssh.status %}
                         <span style="margin:auto; display:table;"   class="fas fa-times-circle"  aria-hidden="true"></span>

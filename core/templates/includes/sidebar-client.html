@@ -1,0 +1,84 @@
+
+
+    <div class="sidebar">
+      <div class="sidebar-wrapper">
+        
+        <div class="logo">
+{#          <a target="_blank" href="" class="simple-text logo-mini">#}
+{#             Register#}
+{#          </a>#}
+          <a target="_blank" href="" class="simple-text logo-normal">
+            Django Terminal
+          </a>
+        </div>
+
+        {% if user.is_authenticated %}
+        <ul class="nav">
+          <li class="active ">
+            <a href="/{{ip}}/client_page">
+              <i class="tim-icons icon-chart-pie-36"></i>
+              <p>Client Info</p>
+            </a>
+          </li>
+          <li>
+            <a href="/{{ip}}/send_command">
+              <i class="tim-icons icon-atom"></i>
+              <p>RUN COMMAND</p>
+            </a>
+          </li>
+          <li>
+            <a href="/ui-maps.html">
+              <i class="tim-icons icon-pin"></i>
+              <p>SHOW LOG</p>
+            </a>
+          </li>
+          <li>
+{#            <a href="/ui-notifications.html">#}
+{#              <i class="tim-icons icon-bell-55"></i>#}
+{#              <p>Notifications</p>#}
+{#            </a>#}
+{#          </li>#}
+{#          <li>#}
+{#            <a href="/page-user.html">#}
+{#              <i class="tim-icons icon-single-02"></i>#}
+{#              <p>User Profile</p>#}
+{#            </a>#}
+{#          </li>#}
+{#          <li>#}
+{#            <a href="/ui-tables.html">#}
+{#              <i class="tim-icons icon-puzzle-10"></i>#}
+{#              <p>Table List</p>#}
+{#            </a>#}
+{#          </li>#}
+{#          <li>#}
+{#            <a href="/ui-typography.html">#}
+{#              <i class="tim-icons icon-align-center"></i>#}
+{#              <p>Typography</p>#}
+{#            </a>#}
+{#          </li>#}
+{##}
+{#          <li>#}
+{#            <a href="/page-rtl-support.html">#}
+{#              <i class="tim-icons icon-world"></i>#}
+{#              <p>RTL Support</p>#}
+{#            </a>#}
+{#          </li>#}
+          <li>
+            <a href="{% url 'logout' %}" >
+              <i class="tim-icons icon-user-run"></i>
+              <p>Logout</p>
+            </a>
+          </li>
+
+{#          <li class="active-pro">#}
+{#            <a target="_blank" href="https://appseed.us/admin-dashboards/django-dashboard-black">#}
+{#              <i class="tim-icons icon-spaceship"></i>#}
+{#              <p>See product</p>#}
+{#            </a>#}
+{#          </li>#}
+        </ul>
+        {% endif %}
+
+
+      </div>
+    </div>

@@ -1,0 +1,258 @@
+{% extends 'layouts/base-client.html' %}
+{% block title %}Send Command | Page {% endblock %}
+{% block stylesheets %}{% endblock stylesheets %}
+{% load static %}
+{%  load return_int %}
+
+
+{% block content %}
+<body>
+<link href="{% static 'assets/css/gaugeMeter.css' %}" rel="stylesheet" />
+<link href="{% static 'assets/css/sendcommand-general.css' %}" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.4-build.3588/angular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+
+<script>
+      let ip = '{{ ip }}'
+
+        xmlhttp = new XMLHttpRequest();
+        function log(msg) {
+           document.getElementById("cikti").innerHTML = msg
+         }
+
+        function reqListener () {
+            console.log('komut başladı');
+        }
+
+        function updateProgress (oEvent) {
+            event1 = oEvent;
+            log(oEvent.target.responseText);
+        }
+
+
+        function run() {
+			url = 'http://'+window.location.host+ '/' + ip +'/'+ 'send_command/'+ document.getElementById("command").value +'/';
+			xmlhttp.addEventListener('load', reqListener);
+			xmlhttp.addEventListener('progress', updateProgress, false);
+			var a = xmlhttp.open("GET", url, true);
+			console.log(a)
+			xmlhttp.send();
+		}
+    function onBtnHandler(id,op) {
+        var id = id;
+        var op = op;
+        console.log(id, op);
+        var token ="{{ csrf_token }}";
+        $.ajax({
+            headers: {"X-CSRFToken": token},
+            dataType: "JSON",
+            url: '{% url 'script_delete' ip %}',
+            type: 'POST',
+            data: {"op": op, "id": id},
+            success: function(data){
+               swal(
+                 'Good job!',
+                 data['data'],
+             'success'
+                    )
+         console.log(data['data']);
+         window.location.reload();
+                 },
+            error: function(error){
+         console.log("Error:");
+            swal(
+                 'Fail job!',
+                 data['data'],
+             'error'
+                    )
+                 window.location.reload();
+    }
+        });
+    }
+    var bash = angular.module('bash',[]);
+
+        bash.controller('script', [ '$scope', function($scope){
+    $scope.bash = '#!/bin/bash';
+        }]);
+    </script>
+
+
+
+
+    <section class="content">
+      <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+               <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Bash Script Write</h3>
+              </div>
+                 <form action="{% url 'client_command' ip   %}" method="post">
+    {% csrf_token %}
+
+                        <div class="input-group">
+                                   <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input type="text" class="form-control" placeholder="Script Name"  {{ form.name }}
+                              </div>
+                      <body ng-app='bash'>
+                        <div ng-controller="script">
+                     <div class="input-group">
+                                   <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <textarea type="text"  ng-model='bash' row="4" cols="500" class="form-control" placeholder="Script Here!!"  {{ form.script }}
+                              </div>
+                              </div>
+  </body>
+                               <button type="submit" class="btn btn-primary" value="submit" >Save</button>
+                    </form>
+         </div>
+           </div>
+
+       <div class="col-md-6">
+               <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">Bash Script Table</h3>
+              </div>
+<table id="script" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Bash Script</th>
+                <th>Author</th>
+                <th>Created</th>
+                 <th>Operation</th>
+
+            </tr>
+        </thead>
+        <tbody>
+           {% for script in db %}
+                 {% if  script.point|to_int < 10  %}
+            <tr>
+
+                <td>{{script.name}}</td>
+                <td>{{script.author}}</td>
+                <td>{{script.created}}</td>
+                <td class="text-md-center">      <span data-tooltip="Delete" onclick="onBtnHandler ('{{script.id}}', 'delete')"class="fas fa-trash-alt"  aria-hidden="true"></span>&nbsp;&nbsp;&#160;&#160;&#160;&#160;&#160;&#160;
+
+            </tr>
+                {% endif %}
+
+        {% endfor %}
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+            </div>
+              </div>
+    <br>
+    <br>
+     <div class="col-md-6">
+               <div class="card card-primary">
+           <div class="container2 ">
+  <div class="control-group">
+      <form2>
+    <input id="command" type="text" name="input" placeholder="Please basic command usage" />
+    <label for="input">Command</label>
+   <button data-toggle="modal" data-target="#output" onclick="run()">Send</button>
+             </form2>
+                 </div>
+                     </div>
+                </div>
+                 </div>
+                </section>
+            </body>
+           <div class="modal fade" id="output" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">OutPut {{ ip }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div style="color:blue" class="modal-body">
+                <pre style="color:black" id="cikti"><code></code></pre>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+ <script>
+
+
+
+    var  globalVariable;
+    document.addEventListener('DOMContentLoaded', function() {
+     const webSocketBridge = new channels.WebSocketBridge();
+
+
+      webSocketBridge.connect('/notifications/');
+      webSocketBridge.listen(function(action, stream) {
+        console.log("RESPONSE:", action);
+        if(action.event == "bashscript") {
+            var point = action.point;
+            var script_name = action.name;
+             var token = '{{csrf_token}}';
+            if (10 > point) {
+                 window.alert('script safe for system');
+                $.ajax({
+                    headers: {"X-CSRFToken": token},
+                    dataType: "JSON",
+                    url: '{% url 'update' ip %}',
+                    type: "POST",
+                    data: {
+                        'name': script_name,
+                        'point': point,
+                    },
+                    success: function (data) {
+                        if (data.is_update) {
+                            alert(data.error_message);
+                        }
+                    }
+
+                });
+            } else if (point > 10) {
+                window.alert('script is danger for system');
+                $.ajax({
+                    headers: {"X-CSRFToken": token},
+                    dataType: "JSON",
+                    url: '{% url 'delete' ip %}',
+                    type: "POST",
+                    data: {
+                        'name': script_name,
+                    },
+                    success: function (data) {
+                        if (data.is_delete) {
+                            alert(data.error_message);
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+
+
+      })
+      document.ws = webSocketBridge; /* for debugging */
+    })
+
+    </script>
+                      <script src="{% static 'assets/js/websocketbridge.js' %}" type="text/javascript"></script>
+
+
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+{% endblock javascripts %}
