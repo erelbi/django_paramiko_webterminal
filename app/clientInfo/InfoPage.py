@@ -21,15 +21,23 @@ class Infoclient(View):
         self.system_info = BASHSCRIPT_DIR + ("system_info.sh",) #Neden tupple kullandık çünkü bize hem directory hem isim lazım... kıps :)
 
     def get(self,request,ip):
-        pid = self.pid_info(ip)
         get_system_info = Info.connection_bash_execute(file=self.system_info,ip=ip)
         get_disk_info = Info.connection_ssh_execute(command="lsblk --json",ip=ip)
         get_network_info = Info.connection_ssh_execute(command="ip --json address",ip=ip)
+        get_systemctl = Info.connection_ssh_execute(command="systemctl list-units --type=service --state=active -o json",ip=ip)
 
         get_system_info_json = self.byte_to_json(get_system_info)
         get_system_disk_json = self.byte_to_json(get_disk_info)
-        get_system_network_json =self.byte_to_json(get_network_info)
-        return render(request, 'client/clientinfo.html',{'ip':ip,'pid':pid,'client_info':get_system_info_json,'client_disk_info':get_system_disk_json} )
+        get_system_network_json = self.byte_to_json(get_network_info)
+        get_systemctl_list_json = self.byte_to_json(get_systemctl)
+        print(type(get_systemctl_list_json))
+
+
+        return render(request, 'client/clientinfo.html',{'ip':ip,'client_info':get_system_info_json,
+                                                         'client_disk_info':get_system_disk_json,
+                                                         'system_network':get_system_network_json,
+                                                         'systemctl': get_systemctl_list_json
+                                                         } )
     def post(self, request,ip):
         myfile = request.FILES['myfile']
         fs = FileSystemStorage()

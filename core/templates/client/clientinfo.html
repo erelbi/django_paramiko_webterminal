@@ -14,10 +14,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
 
 
@@ -74,16 +72,144 @@
 
 
     </script>
+<style>
+    .fixed-content {
+    position: sticky;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-width : 100em;
+    height: 18em;
+    word-wrap: break-word;
 
-    <section class="content">
-      <div class="container-fluid">
+
+}
+</style>
+  <section class="content">
+     <div class="container-fluid">
     <div class="row">
-        <div id="chart_div" style="width: 400px; height: 120px;"></div>
-        </div>
-         </div>
-    </section>
+          <div class="col-md-4">
+                 <div id="chart_div" ></div>
+              <sub style="vertical-align:middle">If the system indicators do not work, install the dc package.</sub>
+              <hr>
+              <div>
+                  {% for key,value in client_info.items %}
+                  <p><b style="text-transform: uppercase">{{ key }}</b> : {{ value }}</p>
+                  {% endfor %}
+              </div>
+              <hr>
+               <div class="card card-primary">
+                <h3 class="card-title">Active Service</h3>
+              </div>
+              <div class="col-md-12">
+              <div class="fixed-content">
+                    {% for log in systemctl %}
+                  <div style="clear: both;">
 
-{{pid}}
+                    <p>
+                    <span style="float: left;"> {{ log.unit }} </span> <span style="float: right; text-transform: uppercase;">{{ log.sub }}</span>
+
+                    </p>
+
+                      </div>
+                   {% endfor %}
+              </div>
+                  </div>
+          </div>
+
+        <div class="col-md-8">
+<div class=" table">
+      <div class="card card-primary">
+                <h3 class="card-title">Disk Info</h3>
+              </div>
+    <table class="table table-striped table-bordered dt-responsive nowrap">
+        <thead>
+            <tr>
+                <th> Name </th>
+
+                <th> Size </th>
+
+                <th> Type </th>
+
+
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for disk in  client_disk_info.blockdevices %}
+        <td> {{ disk.name }} </td>
+
+        <td> {{ disk.sIze }} </td>
+
+        <td> {{ disk.type }} </td>
+        {%  for partition in disk.children %}
+        <td> Disk Partitions
+        <table>
+
+        <tr>
+            <td> Disk Name </td>
+            <td> Disk Size </td>
+            <td> Mount Point</td>
+        </tr>
+            <td> {{ partition.name }} </td>
+            <td> {{ partition.sIze }}</td>
+            <td> {{ partition.mountpoInt }}</td>
+        </table>
+            {%  endfor %}
+        </td>
+
+        </tbody>
+        {% endfor %}
+    </table>
+     <div class="card card-primary">
+                <h3 class="card-title">Network Info</h3>
+              </div>
+     </div>
+             <table class="table table-striped table-bordered dt-responsive nowrap">
+        <thead>
+            <tr>
+                <th> Name </th>
+
+                <th> Flags </th>
+
+                <th> Operstate </th>
+
+
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for network in  system_network %}
+        <td> {{ network.ifname }} </td>
+
+        <td> {{ network.flags }} </td>
+
+        <td> {{ network.operstate }} </td>
+        {%  for addr in network.addr_info %}
+        <td> Network Card
+        <table>
+
+        <tr>
+            <td>  Interface </td>
+            <td> Ip  </td>
+            <td> Scope </td>
+        </tr>
+            <td> {{ addr.label}} </td>
+            <td> {{ addr.local }}</td>
+            <td> {{ addr.scope}}</td>
+        </table>
+            {%  endfor %}
+        </td>
+
+        </tbody>
+        {% endfor %}
+    </table>
+        </div>
+           </div>
+              </div>
+
+
+
+
 
  <script>
 
@@ -149,11 +275,9 @@
                       <script src="{% static 'assets/js/websocketbridge.js' %}" type="text/javascript"></script>
 
 
-{{client_info}}
 
 
 
-{{ client_disk_info }}
 {% endblock content %}
 
 
